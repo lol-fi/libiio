@@ -699,19 +699,28 @@ class Device(_DeviceOrTrigger):
 		self.ctx = weakref.ref(ctx)
 
 	def _set_trigger(self, trigger):
-		_d_set_trigger(self._device, trigger._device if trigger else None)
+        try:
+		    _d_set_trigger(self._device, trigger._device if trigger else None)
+        except:
+            print("Couldn't set device trigger\n")
 
 	def _get_trigger(self):
 		value = _Device()
-		_d_get_trigger(self._device, _byref(value))
+        try:
+		    _d_get_trigger(self._device, _byref(value))
+        except:
+            print("Couldn't get device trigger")
 
 		for dev in self.ctx()._devices:
 			if value == dev._device:
 				return dev
 		return None
 
-	trigger = property(_get_trigger, _set_trigger, None, \
+    try:
+	    trigger = property(_get_trigger, _set_trigger, None, \
 			"Contains the configured trigger for this IIO device.\n\ttype=iio.Trigger")
+    except:
+        print("Could not get the device trigger")
 
 class Context(object):
 	"""Contains the representation of an IIO context."""
@@ -730,19 +739,25 @@ class Context(object):
 		"""
 		self._context = None
 
-		if(_context is None):
-			self._context = _new_default()
-		elif type(_context) is str or type(_context) is unicode:
-			self._context = _new_uri(_context.encode('ascii'))
-		else:
-			self._context = _context
+        try:
+            if(_context is None):
+                self._context = _new_default()
+            elif type(_context) is str or type(_context) is unicode:
+                self._context = _new_uri(_context.encode('ascii'))
+            else:
+                self._context = _context
+        except:
+            print("Could not create context")
 
-		self._attrs = {}
-		for x in range(0, _get_attrs_count(self._context)):
-			str1 = c_char_p()
-			str2 = c_char_p()
-			_get_attr(self._context, x, _byref(str1), _byref(str2))
-			self._attrs[str1.value.decode('ascii')] = str2.value.decode('ascii')
+        try:
+            self._attrs = {}
+            for x in range(0, _get_attrs_count(self._context)):
+                str1 = c_char_p()
+                str2 = c_char_p()
+                _get_attr(self._context, x, _byref(str1), _byref(str2))
+                self._attrs[str1.value.decode('ascii')] = str2.value.decode('ascii')
+        except:
+            print("Could not get attributes")
 
 		# TODO(pcercuei): Use a dictionary for the devices.
 		self._devices = [ Trigger(dev) if _d_is_trigger(dev) else Device(self, dev) for dev in \
