@@ -732,6 +732,7 @@ class Context(object):
 		"""
 		self._context = None
 
+        print("MAKING CTX")
 		if(_context is None):
 			self._context = _new_default()
 		elif type(_context) is str or type(_context) is unicode:
