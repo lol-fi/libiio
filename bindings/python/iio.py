@@ -697,7 +697,6 @@ class Device(_DeviceOrTrigger):
 	def __init__(self, ctx, _device):
 		super(Device, self).__init__(_device)
 		self.ctx = weakref.ref(ctx)
-        print("***********************SET IIO DEVICE**************************")
 
 	def _set_trigger(self, trigger):
 		_d_set_trigger(self._device, trigger._device if trigger else None)
@@ -731,7 +730,6 @@ class Context(object):
 		"""
 		self._context = None
 
-        print("MAKING CTX")
 		if(_context is None):
 			self._context = _new_default()
 		elif type(_context) is str or type(_context) is unicode:
