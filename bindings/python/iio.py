@@ -697,7 +697,7 @@ class Device(_DeviceOrTrigger):
 	def __init__(self, ctx, _device):
 		super(Device, self).__init__(_device)
 		self.ctx = weakref.ref(ctx)
-        print("***********************SET IIO DEVICE**************************)
+        print("***********************SET IIO DEVICE**************************")
 
 	def _set_trigger(self, trigger):
 		_d_set_trigger(self._device, trigger._device if trigger else None)
