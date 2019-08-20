@@ -511,7 +511,6 @@ class Buffer(object):
 		returns: type=iio.Buffer
 			An new instance of this class
 		"""
-        print("***********************in class buffer*********************")
 		try:
 			self._buffer = _create_buffer(device._device, samples_count, cyclic)
 		except:
