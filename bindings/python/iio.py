@@ -30,12 +30,14 @@ def _checkNull(result, func, arguments):
       return result
    else:
       err = get_last_error() if 'Windows' in _system() else get_errno()
+      print("Invalid argument, null result\n")
       raise OSError(err, _strerror(err))
 
 def _checkNegative(result, func, arguments):
    if result >= 0:
       return result
    else:
+      print("Invalid argument, creates negative value in function\n")
       raise OSError(-result, _strerror(-result))
 
 class _ScanContext(Structure):
@@ -369,12 +371,23 @@ class _Attr(object):
    def __str__(self):
       return self._name
 
-   name = property(lambda self: self._name, None, None,
+   try:
+       name = property(lambda self: self._name, None, None,
          "The name of this attribute.\n\ttype=str")
-   filename = property(lambda self: self._filename, None, None,
+   except:
+       print("Could not set the name of this attribute\n")
+
+   try:
+       filename = property(lambda self: self._filename, None, None,
          "The filename in sysfs to which this attribute is bound.\n\ttype=str")
-   value = property(lambda self: self.__read(), lambda self, x: self.__write(x),
+   except:
+       print("Could not set filename in sysfs\n")
+
+   try:
+       value = property(lambda self: self.__read(), lambda self, x: self.__write(x),
          None, "Current value of this attribute.\n\ttype=str")
+   except:
+       print("Could not set this value of this attr\n")
 
 class ChannelAttr(_Attr):
    """Represents an attribute of a channel."""
@@ -389,7 +402,10 @@ class ChannelAttr(_Attr):
       return buf.value.decode('ascii')
 
    def _Attr__write(self, value):
-      _c_write_attr(self._channel, self._name_ascii, value.encode('ascii'))
+      try:
+          _c_write_attr(self._channel, self._name_ascii, value.encode('ascii'))
+      except:
+          print("Could not write channel attr\n")
 
 class DeviceAttr(_Attr):
    """Represents an attribute of an IIO device."""
@@ -400,11 +416,17 @@ class DeviceAttr(_Attr):
 
    def _Attr__read(self):
       buf = create_string_buffer(1024)
-      _d_read_attr(self._device, self._name_ascii, buf, len(buf))
+      try:
+          _d_read_attr(self._device, self._name_ascii, buf, len(buf))
+      except:
+          print("Could not read attribute\n")
       return buf.value.decode('ascii')
 
    def _Attr__write(self, value):
-      _d_write_attr(self._device, self._name_ascii, value.encode('ascii'))
+      try:
+          _d_write_attr(self._device, self._name_ascii, value.encode('ascii'))
+      except:
+          print("Could not write attribute\n")
 
 class DeviceDebugAttr(DeviceAttr):
    """Represents a debug attribute of an IIO device."""
